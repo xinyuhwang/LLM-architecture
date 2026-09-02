@@ -32,3 +32,5 @@ Reshapes the distribution before sampling, by dividing all the raw scores (logit
 When request JSON or a specific schema, there are two common approaches:
 * Prompting-based: the model is just instructed ("respond only in valid JSON matching this schema") and relies on its training to comply.
 * Constrained decoding: at each generation step, the sampler is restricted to only tokens that would keep the output valid according to a grammar/schema (e.g., after `{"name":` it's not allowed to sample a token that would break JSON syntax). This gives a hard guarantee of valid structure and is how most "guaranteed JSON" / function-calling features work under the hood.
+## Visual pipeline diagram
+<img width="494" height="219" alt="prompt_processing" src="https://github.com/user-attachments/assets/25891cc7-84bf-4072-bca3-451b6de38473" />
