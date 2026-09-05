@@ -19,3 +19,10 @@ depending on the use cases.
 ## Semantic search
 A data retrieval method that focuses on understanding the intent and contextual meaning of a query rather than just matching exact keywords.
 ## Chunking
+The method used to split large documents into smaller, manageable pieces before turning them into vector embeddings. Chunk size is used to define the maximum number of tokens or words allowed in a single chunk. Chunk overlap is used to including a small amount of text from the end of one chunk at the start of the next to prevent losing context at the boundaries.
+* Fixed-Size Chunking: Cuts text into exact block sizes based on a set number of characters, words, or tokens. It's best for large pipelines where speed and simplicity matter more than deep context matching. The drawback is it may cut sentences right in the middle of a thought.
+* Recursive / Sentence-Aware Chunking: Tries to split text at natural breaks like paragraph marks first, then sentences, and finally words. It's best for general articles, blog posts, and text documents.
+* Semantic Chunking: Measures the meaning between adjacent sentences and starts a new chunk when the topic or tone shifts. It's best for complex documents that mix multiple distinct topics.
+* Document-Structure Chunking: Splits text using existing markers like Markdown headers (##), HTML tags, or page breaks. It's best for technical wikis, manuals, and structured documentation.
+## Metadata filtering
+A technique to restrict and refine search results using structured, non-vector attributes that attached to the documents. It helps increasing the precision in context retrieval. 
