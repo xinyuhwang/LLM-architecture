@@ -1,3 +1,33 @@
+# Reliable AI Applications
+deterministic software + probabilistic reasoning + external tools + state + recovery mechanisms
+## Comparison Between Traditional Application With AI Application
+* Traditional Application
+
+  HTTP request -> validate input -> query database -> business logic -> return response
+* AI application
+```
+User
+  │
+  ▼
+LLM reasoning
+  │
+  ▼
+Agent Loop  ◄────────────────┐
+  │                          │
+  ├──────────┬──────────┐    │
+  ▼          ▼          ▼    │
+Tool A     Tool B     Tool C │
+  │          │          │    │
+  └──────────┼──────────┘    │
+             ▼               │
+           State ────────────┘
+             │
+             ▼
+     (loop again, or)
+             │
+             ▼
+      Final response
+```
 ## LLM APIs
 A way to send text (a "prompt") to a model over HTTP and get text back.
 ## Structured outputs
