@@ -103,3 +103,30 @@ Validation is the layer that catches errors before they become side effects, whi
 * Exact match response caching. If the same full prompt/context is likely to recur (common in eval runs, or repeated user queries), caching the entire model response and short circuiting the loop entirely can save a full round of calls.
 ## Orchestration
 The management, sequencing, and coordination of data flows, prompt chains, tool calls, and model components to execute a cohesive, multi-step application workflow. It's the coordination layer of the agentic system.
+### Workflows
+A workflow is the defined structure of what steps happen and in what order.
+* Static workflows (DAGs): the sequence is fixed by code ahead of time.
+* Dynamic workflows (agent-driven): the LLM decides the next step at runtime.
+
+Most real systems are a hybrid: a fixed outer skeleton (validate input → run agent loop → validate output → deliver result) with a dynamic agent loop nested inside one stage.
+### State
+State is whatever needs to persist across steps — conversation history, intermediate results, tool outputs, counters, flags. The orchestration layer owns this because individual steps shouldn't need to know how they got the input they're operating on; they just read from and write to a shared state object.
+
+Design Questions:
+* Scope: what's global to the whole workflow vs. local to one step or one loop iteration?
+* Shape: is state a simple accumulating log, or a mutable structured object? Accumulating log is easier to debug and replay; mutable is more compact but loses history.
+### Checkpoints
+A checkpoint is a saved snapshot of state at a point in the workflow, so execution can be paused and resumed without starting over. This matters for two distinct reasons:
+* Durability: if the process crashes in the middle of a workflow (server restart, deploy, timeout), you resume from the last checkpoint instead of re-running everything from the top. It's important for long running agent loops or workflows with expensive/side effecting steps you don't want to repeat.
+* Human-in-the-loop: some workflows need to pause for approval, therefore a checkpoint is what lets the workflow suspend, wait indefinitely for outside input, and resume exactly where it left off.
+### Parallel execution
+Parallel execution is a pure latency/throughput optimization. Some steps don't depend on each other's output, so they can run concurrently instead of sequentially. Orchestration is responsible for:
+* Identifying independence: which steps can safely run in parallel (no shared mutating state, no ordering dependency)
+* Fan-out / fan-in: dispatching N parallel branches and then merging their results back into a single state before continuing
+* Partial failure handling
+### Error recovery
+This is where all the reliability features from the previous discussion (retries, fallback, timeout, idempotency, validation) get applied at the orchestration level, rather than inside a single tool call. The orchestration layer has to decide, for any failure at any step:
+* Retry the failed step, using the checkpointed state from just before it
+* Fall back to an alternative path and continue the workflow in a degraded mode
+* Compensate: undo or offset the effects of steps that already succeeded, if a later step in the same workflow fails
+* Fail the whole workflow cleanly, surfacing a useful error rather than a partial, inconsistent state
